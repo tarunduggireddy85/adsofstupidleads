@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { background: #0b0d12; color: #e7ecf3; }
+
+.btn { @apply inline-flex items-center justify-center rounded-md bg-accent/20 text-accent border border-accent/30 px-3 py-1.5 text-sm font-medium hover:bg-accent/30 transition; }
+.btn-primary { @apply inline-flex items-center justify-center rounded-md bg-accent text-black px-3 py-1.5 text-sm font-semibold hover:opacity-90 transition; }
+.btn-ghost { @apply inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm hover:bg-panel transition; }
+.btn-danger { @apply inline-flex items-center justify-center rounded-md bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1.5 text-sm hover:bg-red-500/30 transition; }
+.input { @apply w-full rounded-md bg-panel border border-border px-3 py-2 text-sm focus:border-accent outline-none; }
+.label { @apply block text-xs uppercase tracking-wide text-muted mb-1; }
+.card { @apply rounded-lg border border-border bg-panel; }
+.badge { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium; }
+.badge-new { @apply badge bg-blue-500/20 text-blue-300; }
+.badge-assigned { @apply badge bg-purple-500/20 text-purple-300; }
+.badge-contacted { @apply badge bg-yellow-500/20 text-yellow-200; }
+.badge-quoted { @apply badge bg-orange-500/20 text-orange-200; }
+.badge-negotiating { @apply badge bg-amber-500/20 text-amber-200; }
+.badge-converted { @apply badge bg-emerald-500/20 text-emerald-300; }
+.badge-rejected { @apply badge bg-red-500/20 text-red-300; }
+.badge-lost { @apply badge bg-gray-500/20 text-gray-300; }
+table.tbl { @apply w-full text-sm; }
+table.tbl th { @apply text-left text-xs uppercase text-muted font-medium px-3 py-2 border-b border-border; }
+table.tbl td { @apply px-3 py-2 border-b border-border/60 align-middle; }
+table.tbl tr:hover td { @apply bg-white/[0.02]; }
