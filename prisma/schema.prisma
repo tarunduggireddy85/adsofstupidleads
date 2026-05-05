@@ -1,0 +1,127 @@
+// Lead tracking platform schema
+// Switch to postgres for production: provider = "postgresql"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum LeadStatus {
+  NEW
+  ASSIGNED
+  CONTACTED
+  QUOTED
+  NEGOTIATING
+  CONVERTED
+  REJECTED
+  LOST
+}
+
+enum CommissionType {
+  NONE
+  PERCENT
+  FIXED
+}
+
+enum ConversionStatus {
+  PENDING
+  APPROVED
+  DISPUTED
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  passwordHash String
+  role        Role     @default(CLIENT)
+  client      Client?  @relation(fields: [clientId], references: [id])
+  clientId    String?  @unique
+  createdAt   DateTime @default(now())
+}
+
+model Client {
+  id              String         @id @default(cuid())
+  name            String
+  businessName    String?
+  whatsappNumber  String?
+  notes           String?
+  commissionType  CommissionType @default(NONE)
+  commissionValue Float          @default(0) // percent (0-100) or fixed amount
+  currency        String         @default("INR")
+  active          Boolean        @default(true)
+  user            User?
+  leads           Lead[]
+  createdAt       DateTime       @default(now())
+}
+
+model Lead {
+  id            String       @id @default(cuid())
+  // Public reference shown to client (short)
+  ref           String       @unique
+  customerName  String
+  customerPhone String
+  source        String?      // e.g. "Meta Ads - campaign X"
+  notes         String?
+  client        Client       @relation(fields: [clientId], references: [id])
+  clientId      String
+  status        LeadStatus   @default(NEW)
+  dealAmount    Float?       // captured at conversion
+  events        StatusEvent[]
+  conversion    Conversion?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([clientId, status])
+  @@index([createdAt])
+}
+
+model StatusEvent {
+  id        String     @id @default(cuid())
+  lead      Lead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  fromStatus LeadStatus?
+  toStatus   LeadStatus
+  note      String?
+  actorId   String     // userId
+  actorRole Role
+  createdAt DateTime   @default(now())
+
+  @@index([leadId])
+}
+
+model Conversion {
+  id           String           @id @default(cuid())
+  lead         Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId       String           @unique
+  dealAmount   Float
+  commission   Float            // computed at submission
+  proofPath    String?          // /uploads/...
+  status       ConversionStatus @default(PENDING)
+  submittedById String
+  reviewNote   String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime         @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  actorRole Role
+  action    String
+  target    String   // e.g. "lead:abc123"
+  meta      String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@index([target])
+}
